@@ -128,7 +128,7 @@ class NiasIME : InputMethodService() {
             }
             
             val code = (parent.tag as? String)?.toInt() ?: 0
-            if (code == 44 || code == 46) {
+            if (isSpecialKey(code)) {
                 parent.setOnLongClickListener {
                     showLongPressOptions(it, code)
                     true
@@ -137,18 +137,52 @@ class NiasIME : InputMethodService() {
         }
     }
 
+    private fun isSpecialKey(code: Int): Boolean {
+        // Includes , . a e i o u n s l
+        return code == 44 || code == 46 || 
+               code == 97 || code == 101 || code == 105 || code == 111 || code == 117 ||
+               code == 110 || code == 115 || code == 108
+    }
+
     private fun showLongPressOptions(view: View, code: Int) {
-        val options = if (code == 44) "!?-" else "±~|{}[]"
+        val options = when (code) {
+            44 -> "!?-"
+            46 -> "±~|{}[]"
+            97 -> "åãâáàä"
+            101 -> "ęēëêéè€"
+            105 -> "ïîíì"
+            111 -> "öõǒőōôóò"
+            117 -> "ûúùü"
+            110 -> "ñ"
+            115 -> "ß\$"
+            108 -> "£"
+            else -> return
+        }
+        
         val popupMenu = PopupMenu(this, view)
         options.forEachIndexed { index, char ->
             popupMenu.menu.add(0, index, index, char.toString())
         }
         popupMenu.setOnMenuItemClickListener { item ->
             val char = options[item.itemId]
-            handleKey(char.code)
+            handleLongPressSelection(char)
             true
         }
         popupMenu.show()
+    }
+
+    private fun handleLongPressSelection(char: Char) {
+        val ic = currentInputConnection ?: return
+        var finalChar = char
+        if (isCaps && char.isLetter()) {
+            finalChar = char.uppercaseChar()
+        }
+        ic.commitText(finalChar.toString(), 1)
+        
+        if (isCaps) {
+            isCaps = false
+            updateKeyLabels(keyboardContainer)
+        }
     }
 
     private fun updateKeyLabels(parent: View) {
