@@ -138,10 +138,10 @@ class NiasIME : InputMethodService() {
     }
 
     private fun isSpecialKey(code: Int): Boolean {
-        // Includes , . a e i o u n s l
+        // Includes , . a e i o u n s l w
         return code == 44 || code == 46 || 
                code == 97 || code == 101 || code == 105 || code == 111 || code == 117 ||
-               code == 110 || code == 115 || code == 108
+               code == 110 || code == 115 || code == 108 || code == 119
     }
 
     private fun showLongPressOptions(view: View, code: Int) {
@@ -151,11 +151,12 @@ class NiasIME : InputMethodService() {
             97 -> "åãâáàä"
             101 -> "ęēëêéè€"
             105 -> "ïîíì"
-            111 -> "öõǒőōôóò"
+            111 -> "õǒőōôóòö"
             117 -> "ûúùü"
             110 -> "ñ"
             115 -> "ß\$"
             108 -> "£"
+            119 -> "ŵ"
             else -> return
         }
         
@@ -192,7 +193,13 @@ class NiasIME : InputMethodService() {
             }
         } else if (parent is Button) {
             val code = (parent.tag as? String)?.toInt() ?: 0
-            if (code > 0 && code != 32) {
+            if (code == 32) {
+                parent.text = when {
+                    isNumericMode -> ""
+                    isNiasMode -> "LI NIHA"
+                    else -> "INDONESIA"
+                }
+            } else if (code > 0) {
                 val char = code.toChar()
                 parent.text = if (isCaps) char.uppercaseChar().toString() else char.lowercaseChar().toString()
             }
@@ -204,6 +211,7 @@ class NiasIME : InputMethodService() {
         
         val keyColor = ContextCompat.getColor(this, if (isDark) R.color.gboard_dark_key else R.color.gboard_light_key)
         val textColor = if (isDark) Color.WHITE else Color.BLACK
+        val hintColor = if (isDark) Color.argb(60, 255, 255, 255) else Color.argb(60, 0, 0, 0)
 
         if (parent is ViewGroup) {
             for (i in 0 until parent.childCount) {
@@ -211,7 +219,14 @@ class NiasIME : InputMethodService() {
             }
         } else if (parent is Button) {
             parent.background.mutate().setColorFilter(keyColor, PorterDuff.Mode.SRC_IN)
-            parent.setTextColor(textColor)
+            val code = (parent.tag as? String)?.toInt() ?: 0
+            if (code == 32) {
+                parent.setTextColor(hintColor)
+                parent.textSize = 12f
+            } else {
+                parent.setTextColor(textColor)
+                parent.textSize = 18f
+            }
         }
     }
 
