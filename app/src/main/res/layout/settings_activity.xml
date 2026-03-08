@@ -1,0 +1,110 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:background="#E8EAF6"
+    android:padding="24dp">
+
+    <!-- App Icon Placeholder -->
+    <ImageView
+        android:id="@+id/app_logo"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:layout_marginBottom="24dp"
+        android:contentDescription="App Logo"
+        android:src="@mipmap/ic_launcher_round" />
+
+    <TextView
+        android:id="@+id/tv_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Nias Keyboard"
+        android:textColor="#3F51B5"
+        android:textSize="28sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="4dp" />
+
+    <TextView
+        android:id="@+id/tv_subtitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Ya'ahowu!"
+        android:textColor="#5C6BC0"
+        android:textSize="18sp"
+        android:layout_marginBottom="32dp" />
+
+    <!-- Language Selector Buttons -->
+    <TextView
+        android:id="@+id/tv_lang_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Choose Language:"
+        android:textColor="#3949AB"
+        android:textSize="14sp"
+        android:layout_marginBottom="8dp" />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginBottom="32dp">
+
+        <Button
+            android:id="@+id/btn_lang_nia"
+            style="?android:attr/borderlessButtonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Li Niha"
+            android:textColor="#3F51B5"
+            android:textAllCaps="false" />
+
+        <Button
+            android:id="@+id/btn_lang_id"
+            style="?android:attr/borderlessButtonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Indonesia"
+            android:textColor="#3F51B5"
+            android:textAllCaps="false" />
+
+        <Button
+            android:id="@+id/btn_lang_en"
+            style="?android:attr/borderlessButtonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="English"
+            android:textColor="#3F51B5"
+            android:textAllCaps="false" />
+    </LinearLayout>
+
+    <CheckBox
+        android:id="@+id/check_dark_mode"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Enable Dark Mode"
+        android:textColor="#3949AB"
+        android:buttonTint="#3F51B5"
+        android:textSize="18sp"
+        android:layout_marginBottom="24dp" />
+
+    <Button
+        android:id="@+id/btn_enable_ime"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:text="Activate Keyboard"
+        android:backgroundTint="#3F51B5"
+        android:textColor="@android:color/white"
+        android:textAllCaps="false"
+        android:textSize="18sp" />
+
+    <TextView
+        android:id="@+id/tv_footer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:text="Configure in Android Settings"
+        android:textColor="#7986CB"
+        android:textSize="14sp" />
+
+</LinearLayout>
