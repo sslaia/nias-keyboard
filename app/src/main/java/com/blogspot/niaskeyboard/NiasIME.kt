@@ -124,7 +124,7 @@ class NiasIME : InputMethodService() {
         } else if (parent is Button) {
             parent.setOnClickListener {
                 val code = (it.tag as? String)?.toInt() ?: 0
-                handleKey(code)
+                handleKey(code, it)
             }
             
             val code = (parent.tag as? String)?.toInt() ?: 0
@@ -138,13 +138,18 @@ class NiasIME : InputMethodService() {
     }
 
     private fun isSpecialKey(code: Int): Boolean {
-        // Includes , . a e i o u n s l w
+        // Includes , . a e i o u n s l w emoji
         return code == 44 || code == 46 || 
                code == 97 || code == 101 || code == 105 || code == 111 || code == 117 ||
-               code == 110 || code == 115 || code == 108 || code == 119
+               code == 110 || code == 115 || code == 108 || code == 119 || code == -101
     }
 
     private fun showLongPressOptions(view: View, code: Int) {
+        if (code == -101) {
+            showEmojiPopup(view)
+            return
+        }
+
         val options = when (code) {
             44 -> "!?-"
             46 -> "±~|{}[]"
@@ -230,10 +235,13 @@ class NiasIME : InputMethodService() {
         }
     }
 
-    private fun handleKey(primaryCode: Int) {
+    private fun handleKey(primaryCode: Int, view: View? = null) {
         val ic = currentInputConnection ?: return
 
         when (primaryCode) {
+            -101 -> { // Emoji
+                view?.let { showEmojiPopup(it) }
+            }
             -5 -> { // Delete
                 ic.sendKeyEvent(KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_DEL))
                 ic.sendKeyEvent(KeyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_DEL))
@@ -279,6 +287,20 @@ class NiasIME : InputMethodService() {
                 suggestWords(content?.toString() ?: "")
             }
         }
+    }
+
+    private fun showEmojiPopup(anchor: View) {
+        val popupMenu = PopupMenu(this, anchor)
+        val emojis = listOf("😀", "😂", "😍", "👍", "🙏", "✨", "🎉", "❤️", "😊", "😎")
+        emojis.forEachIndexed { index, emoji ->
+            popupMenu.menu.add(0, index, index, emoji)
+        }
+        popupMenu.setOnMenuItemClickListener { item ->
+            val emoji = emojis[item.itemId]
+            currentInputConnection?.commitText(emoji, 1)
+            true
+        }
+        popupMenu.show()
     }
 
     private fun suggestWords(input: String) {
