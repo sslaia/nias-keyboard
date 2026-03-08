@@ -1,6 +1,7 @@
 package com.blogspot.niaskeyboard
 
 import android.content.Context
+import android.content.res.Configuration
 import android.graphics.Color
 import android.graphics.PorterDuff
 import android.inputmethodservice.InputMethodService
@@ -66,6 +67,15 @@ class NiasIME : InputMethodService() {
         }
     }
 
+    private fun isDarkMode(): Boolean {
+        val prefs = getSharedPreferences("nias_prefs", Context.MODE_PRIVATE)
+        val forceDark = prefs.getBoolean("dark_mode", false)
+        if (forceDark) return true
+        
+        val nightModeFlags = resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
+        return nightModeFlags == Configuration.UI_MODE_NIGHT_YES
+    }
+
     override fun onCreateInputView(): View {
         inputContainer = layoutInflater.inflate(R.layout.keyboard_view, null)
         keyboardContainer = inputContainer.findViewById(R.id.keyboard_container)
@@ -78,7 +88,6 @@ class NiasIME : InputMethodService() {
             val spacer = v.findViewById<View>(R.id.keyboard_bottom_spacer)
             val params = spacer?.layoutParams
             if (params != null) {
-                // Use the maximum of system bars or navigation bars to ensure we clear the area
                 params.height = Math.max(systemBars.bottom, navBars.bottom)
                 spacer.layoutParams = params
             }
@@ -129,8 +138,7 @@ class NiasIME : InputMethodService() {
     }
 
     private fun showLongPressOptions(view: View, code: Int) {
-        // Comma: -+±_()  Full stop: ?!;:&<>
-        val options = if (code == 44) "[]|±-" else "{}~!?"
+        val options = if (code == 44) "!?-" else "±~|{}[]"
         val popupMenu = PopupMenu(this, view)
         options.forEachIndexed { index, char ->
             popupMenu.menu.add(0, index, index, char.toString())
@@ -158,8 +166,7 @@ class NiasIME : InputMethodService() {
     }
 
     private fun applyThemeToKeys(parent: View) {
-        val prefs = getSharedPreferences("nias_prefs", Context.MODE_PRIVATE)
-        val isDark = prefs.getBoolean("dark_mode", false)
+        val isDark = isDarkMode()
         
         val keyColor = ContextCompat.getColor(this, if (isDark) R.color.gboard_dark_key else R.color.gboard_light_key)
         val textColor = if (isDark) Color.WHITE else Color.BLACK
@@ -251,8 +258,7 @@ class NiasIME : InputMethodService() {
             return
         }
 
-        val prefs = getSharedPreferences("nias_prefs", Context.MODE_PRIVATE)
-        val isDark = prefs.getBoolean("dark_mode", false)
+        val isDark = isDarkMode()
         val textColor = if (isDark) Color.WHITE else Color.BLACK
 
         for (word in matches) {
@@ -290,11 +296,15 @@ class NiasIME : InputMethodService() {
         suggestWords(content?.toString() ?: "")
     }
 
-    override fun onStartInputView(info: EditorInfo?, restarting: Boolean) {
-        super.onStartInputView(info, restarting)
-        
-        val prefs = getSharedPreferences("nias_prefs", Context.MODE_PRIVATE)
-        val isDark = prefs.getBoolean("dark_mode", false)
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        if (::inputContainer.isInitialized) {
+            applyTheme()
+        }
+    }
+
+    private fun applyTheme() {
+        val isDark = isDarkMode()
         
         val bgColor = if (isDark) {
             ContextCompat.getColor(this, R.color.gboard_dark_bg)
@@ -309,7 +319,6 @@ class NiasIME : InputMethodService() {
         
         if (::candidateScroll.isInitialized) {
             candidateScroll.setBackgroundColor(bgColor)
-            candidateScroll.visibility = View.GONE
         }
 
         window?.window?.let { win ->
@@ -318,7 +327,14 @@ class NiasIME : InputMethodService() {
             controller.isAppearanceLightNavigationBars = !isDark
         }
         
-        // Re-apply theme to keys whenever the view starts
         applyThemeToKeys(keyboardContainer)
+    }
+
+    override fun onStartInputView(info: EditorInfo?, restarting: Boolean) {
+        super.onStartInputView(info, restarting)
+        applyTheme()
+        if (::candidateScroll.isInitialized) {
+            candidateScroll.visibility = View.GONE
+        }
     }
 }

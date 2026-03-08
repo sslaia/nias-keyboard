@@ -8,6 +8,7 @@ import android.widget.Button
 import android.widget.CheckBox
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.edit
 
 class SettingsActivity : AppCompatActivity() {
@@ -20,6 +21,16 @@ class SettingsActivity : AppCompatActivity() {
     private lateinit var tvFooter: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        val prefs = getSharedPreferences("nias_prefs", Context.MODE_PRIVATE)
+        val isDarkMode = prefs.getBoolean("dark_mode", false)
+        
+        // Apply Dark Mode before super.onCreate
+        if (isDarkMode) {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+        } else {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
+        }
+
         super.onCreate(savedInstanceState)
         setContentView(R.layout.settings_activity)
 
@@ -31,15 +42,20 @@ class SettingsActivity : AppCompatActivity() {
         btnEnable = findViewById(R.id.btn_enable_ime)
         tvFooter = findViewById(R.id.tv_footer)
 
-        val prefs = getSharedPreferences("nias_prefs", Context.MODE_PRIVATE)
-
         // Load saved settings
-        checkDarkMode.isChecked = prefs.getBoolean("dark_mode", false)
+        checkDarkMode.isChecked = isDarkMode
         val savedLang = prefs.getString("app_lang", "en") ?: "en"
         updateLanguageUI(savedLang)
 
         checkDarkMode.setOnCheckedChangeListener { _, isChecked ->
             prefs.edit { putBoolean("dark_mode", isChecked) }
+            if (isChecked) {
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+            } else {
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
+            }
+            // recreate() is often needed to refresh the theme completely
+            recreate()
         }
 
         findViewById<Button>(R.id.btn_enable_ime).setOnClickListener {
