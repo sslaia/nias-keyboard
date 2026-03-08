@@ -227,10 +227,13 @@ class NiasIME : InputMethodService() {
             val code = (parent.tag as? String)?.toInt() ?: 0
             if (code == 32) {
                 parent.setTextColor(hintColor)
-                parent.textSize = 12f
-            } else {
+                parent.textSize = 14f
+            } else if (code < 0) {
                 parent.setTextColor(textColor)
                 parent.textSize = 18f
+            } else {
+                parent.setTextColor(textColor)
+                parent.textSize = 22f
             }
         }
     }
@@ -337,11 +340,20 @@ class NiasIME : InputMethodService() {
             tv.text = word
             tv.setTextColor(textColor)
             tv.setPadding(35, 20, 35, 20)
-            tv.textSize = 18f
+            tv.textSize = 20f
             tv.setOnClickListener {
                 val ic = currentInputConnection
-                ic?.deleteSurroundingText(lastWord.length, 0)
-                ic?.commitText("$word ", 1)
+                val originalWord = input.substringAfterLast(' ', input)
+                val isFirstUpper = originalWord.isNotEmpty() && originalWord[0].isUpperCase()
+                
+                val finalWord = if (isFirstUpper) {
+                    word.replaceFirstChar { it.uppercase() }
+                } else {
+                    word
+                }
+
+                ic?.deleteSurroundingText(originalWord.length, 0)
+                ic?.commitText("$finalWord ", 1)
                 candidateContainer.removeAllViews()
                 candidateScroll.visibility = View.GONE
             }
