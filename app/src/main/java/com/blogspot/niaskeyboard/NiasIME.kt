@@ -33,6 +33,9 @@ class NiasIME : InputMethodService() {
     
     private var isNiasMode = true
     private var isCaps = false
+    private var isShiftLocked = false
+    private var lastShiftTime: Long = 0
+    private var lastSpaceTime: Long = 0
     private var isNumericMode = false
 
     override fun onCreate() {
@@ -185,7 +188,7 @@ class NiasIME : InputMethodService() {
         }
         ic.commitText(finalChar.toString(), 1)
         
-        if (isCaps) {
+        if (isCaps && !isShiftLocked) {
             isCaps = false
             updateKeyLabels(keyboardContainer)
         }
@@ -204,6 +207,8 @@ class NiasIME : InputMethodService() {
                     isNiasMode -> "LI NIHA"
                     else -> "INDONESIA"
                 }
+            } else if (code == -1) {
+                parent.text = if (isShiftLocked) "🔒⬆️" else "⬆️"
             } else if (code > 0) {
                 val char = code.toChar()
                 parent.text = if (isCaps) char.uppercaseChar().toString() else char.lowercaseChar().toString()
@@ -249,22 +254,52 @@ class NiasIME : InputMethodService() {
                 ic.sendKeyEvent(KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_DEL))
                 ic.sendKeyEvent(KeyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_DEL))
                 updateSuggestionsAfterDelete()
+                checkAutoCaps()
             }
             -1 -> { // Shift
-                isCaps = !isCaps
+                val currentTime = System.currentTimeMillis()
+                if (currentTime - lastShiftTime < 400) {
+                    isShiftLocked = !isShiftLocked
+                    isCaps = isShiftLocked
+                } else {
+                    if (isShiftLocked) {
+                        isShiftLocked = false
+                        isCaps = false
+                    } else {
+                        isCaps = !isCaps
+                    }
+                }
+                lastShiftTime = currentTime
                 updateKeyLabels(keyboardContainer)
             }
             -4 -> { // Enter/Done
                 handleWordCompletion()
                 ic.sendKeyEvent(KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_ENTER))
+                checkAutoCaps()
             }
             -2 -> { // Mode Change
                 isNumericMode = !isNumericMode
                 updateKeyboardLayout()
             }
             32 -> { // Space bar
-                handleWordCompletion()
-                ic.commitText(" ", 1)
+                val currentTime = System.currentTimeMillis()
+                if (currentTime - lastSpaceTime < 400) {
+                    val textBefore = ic.getTextBeforeCursor(1, 0)?.toString() ?: ""
+                    if (textBefore == " ") {
+                        ic.deleteSurroundingText(1, 0)
+                        ic.commitText(". ", 1)
+                        lastSpaceTime = 0
+                    } else {
+                        handleWordCompletion()
+                        ic.commitText(" ", 1)
+                        lastSpaceTime = currentTime
+                    }
+                } else {
+                    handleWordCompletion()
+                    ic.commitText(" ", 1)
+                    lastSpaceTime = currentTime
+                }
+                checkAutoCaps()
             }
             -100 -> { // Language Switch
                 isNiasMode = !isNiasMode
@@ -281,14 +316,39 @@ class NiasIME : InputMethodService() {
                 }
                 ic.commitText(char.toString(), 1)
 
-                if (isCaps) {
+                if (isCaps && !isShiftLocked) {
                     isCaps = false
                     updateKeyLabels(keyboardContainer)
                 }
 
                 val content = ic.getTextBeforeCursor(20, 0)
                 suggestWords(content?.toString() ?: "")
+                lastSpaceTime = 0
             }
+        }
+    }
+
+    private fun checkAutoCaps() {
+        if (isShiftLocked) return
+        
+        val ic = currentInputConnection ?: return
+        val textBefore = ic.getTextBeforeCursor(5, 0)?.toString() ?: ""
+        
+        val shouldCap = if (textBefore.isEmpty()) {
+            true
+        } else {
+            val trimmed = textBefore.trimEnd()
+            if (trimmed.isEmpty()) {
+                true
+            } else {
+                val lastChar = trimmed.last()
+                lastChar == '.' || lastChar == '!' || lastChar == '?' || lastChar == '\n'
+            }
+        }
+        
+        if (isCaps != shouldCap) {
+            isCaps = shouldCap
+            updateKeyLabels(keyboardContainer)
         }
     }
 
@@ -356,6 +416,8 @@ class NiasIME : InputMethodService() {
                 ic?.commitText("$finalWord ", 1)
                 candidateContainer.removeAllViews()
                 candidateScroll.visibility = View.GONE
+                
+                checkAutoCaps()
             }
             candidateContainer.addView(tv)
         }
@@ -419,5 +481,6 @@ class NiasIME : InputMethodService() {
         if (::candidateScroll.isInitialized) {
             candidateScroll.visibility = View.GONE
         }
+        checkAutoCaps()
     }
 }

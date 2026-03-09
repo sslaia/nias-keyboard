@@ -1,6 +1,6 @@
 Signature-Version: 1.0
 Created-By: Signflinger
-SHA-256-Digest-Manifest: QlGniLJqHo9zLtnHLwV/CbU3KwZERcy32CqH5+HghqQ=
+SHA-256-Digest-Manifest: dQp7/KDK0lylgq2QiwpEUncNzpJSAfoHs5YK/+CFWDM=
 
 Name: BUNDLE-METADATA/com.android.tools.build.gradle/app-metadata.prop
  erties
@@ -11,7 +11,7 @@ Name: BUNDLE-METADATA/com.android.tools.build.libraries/dependencies.p
 SHA-256-Digest: I+jYZGA4FNu2y4qVIIoyV8FRplA/tTg9ATseGpKLVe0=
 
 Name: BUNDLE-METADATA/com.android.tools.build.profiles/baseline.prof
-SHA-256-Digest: YJobZeE0lYJ5ym0x/GlnRuFdRwyPzZOP6UaNy4MJcXI=
+SHA-256-Digest: JGCF2LMXIXm2S3Cw9uWHnwveFaU+xafERtEJcb3ffIE=
 
 Name: BUNDLE-METADATA/com.android.tools.build.profiles/baseline.profm
 SHA-256-Digest: y6RPRjagsK0tRdAYULOVeQ4nVHVgnIazcLC+nh2dBzk=
@@ -32,7 +32,7 @@ Name: base/assets/nias-dict.txt
 SHA-256-Digest: VoGoa54bUUh7OTuOlxoi6Fqo9do3AJlVRgUmL48yGmQ=
 
 Name: base/dex/classes.dex
-SHA-256-Digest: fvQ73ySRsCcy5o0M/sU/AZ5Vdtr5iZFj0wrqbClNSaI=
+SHA-256-Digest: VBwAJIZTMS3analOm2DEnfGcAOeaNBqisNhEnDsQPpk=
 
 Name: base/dex/classes2.dex
 SHA-256-Digest: otH9+Z9DdyvepK8uNfCshdANCYIrg72/taK5cM17laU=
@@ -41,7 +41,7 @@ Name: base/dex/classes3.dex
 SHA-256-Digest: H+L8W3EeRbt3V0fNR1N1Wf3fE4gAB3zpEf8UnTmMw/Y=
 
 Name: base/manifest/AndroidManifest.xml
-SHA-256-Digest: xMJY2UsM+RZAy+peeMTE+hmVpZegzhFps5oPr0LtAuU=
+SHA-256-Digest: DaYk3P57PDPeX1X7MevzSWn3J1uoSEJofngPqZ/kE/8=
 
 Name: base/res/anim-v21/fragment_fast_out_extra_slow_in.xml
 SHA-256-Digest: jS4uyqNlbcrZhNtn8U31F2m/lpBVY3ruQE7hUwExG/U=
@@ -2542,13 +2542,13 @@ Name: base/res/layout/ime_secondary_split_test_activity.xml
 SHA-256-Digest: DB2BUeLBOewyV8FUWojP/6fi1XePcN52gbHJuVd9U5A=
 
 Name: base/res/layout/keyboard_indo.xml
-SHA-256-Digest: CosS+6l4IryKIeuQHPWjjwgkNwd3KD0+8yhGLJDGYUE=
+SHA-256-Digest: ODJydOyN17ARV8kqGU78wsR+D0RFy9Hvd817lI5O4gI=
 
 Name: base/res/layout/keyboard_nias.xml
-SHA-256-Digest: 4idzx+2Nv8hm+IU8MgRqxDK3CRJEDrmut/2k9IXt0Ew=
+SHA-256-Digest: BsB8HZMZ59veKmgEnx8DfhI815BomcvMKkr6h+pFV9k=
 
 Name: base/res/layout/keyboard_numeric.xml
-SHA-256-Digest: C/fqHz76roP0hzlk3fIKG0yGy/TfKEwGlcYifPMkLHQ=
+SHA-256-Digest: NIMJlM17eoBCBWaw6Ii7z3tMGzucr6F8rrcQOkccsz0=
 
 Name: base/res/layout/keyboard_view.xml
 SHA-256-Digest: j4hhjW+R57LhiCytmzzoViskXvnBYyQgc1g1+mgB7os=
@@ -2817,9 +2817,6 @@ SHA-256-Digest: nEPe/s5hZOuyANN5QfrSFEsq4ZJFC9EzphUM/EMne1s=
 Name: base/res/xml/data_extraction_rules.xml
 SHA-256-Digest: WxCfavaGsz9ETLNptErodyVUHok26zV3teZlmIoHbBE=
 
-Name: base/res/xml/indo_qwerty.xml
-SHA-256-Digest: McLhh9MJsU2pZq67yIiLG7Amie63dMEJ/esE4/FnOhY=
-
 Name: base/res/xml/m3_button_group_child_size_change.xml
 SHA-256-Digest: tw7UgNBsW/ToqzJjLQuzXSuLqOFs4GWgcjDfud07DEk=
 
@@ -2836,14 +2833,11 @@ SHA-256-Digest: 9XYAU6//sVzuT9NxfZsoEhSbledBV8IYRF2hUZF1pEQ=
 Name: base/res/xml/method.xml
 SHA-256-Digest: L3pvkkYGahV6CC7i3/wfG/K3d5Y9++sM1oBIyaWAN+w=
 
-Name: base/res/xml/nias_qwerty.xml
-SHA-256-Digest: +qEXw6sV1zBjsSQuxpMBgKtfgJg0zBzLKFC6kkLmhZ0=
-
 Name: base/res/xml/numeric_layout.xml
 SHA-256-Digest: BQX80DFVUDyu2KXSL4KpTiHqxskdvEb4HkRvRxbQ3/4=
 
 Name: base/resources.pb
-SHA-256-Digest: dhZXq57hI9Iyc2LgPvK0p9aMeRwHaZIe0ZAE8EJS5nA=
+SHA-256-Digest: aRWI5AZngwyp/5vk+cAGbnoiLgxl1RpcamkqxdjuCVE=
 
 Name: base/root/DebugProbesKt.bin
 SHA-256-Digest: ypS/oc4BR20CnbRUgA+PqGy+Imnsc5oCtRtXHAY5UIE=
@@ -2992,7 +2986,7 @@ Name: base/root/META-INF/services/kotlinx.coroutines.internal.MainDisp
 SHA-256-Digest: c2XawPIZW8/CQqOa3kePO9D32XjpIm5CTUsgetWsq0Q=
 
 Name: base/root/META-INF/version-control-info.textproto
-SHA-256-Digest: YFDixkAUL0hM2kmhSm/YKdZlSZ9YMM4gMClN86YdoEw=
+SHA-256-Digest: LFitgqRxoKPADAeILChFxXIrYrw4eQRfwQVUNmu8s4w=
 
 Name: base/root/kotlin-tooling-metadata.json
 SHA-256-Digest: SFBO0QH3TOCzIhjuNlLjuIOdUdEPFPeryRl2Dcu6oT8=
