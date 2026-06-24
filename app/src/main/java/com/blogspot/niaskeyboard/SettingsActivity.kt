@@ -10,6 +10,7 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.edit
+import androidx.activity.enableEdgeToEdge
 
 class SettingsActivity : AppCompatActivity() {
 
@@ -17,10 +18,12 @@ class SettingsActivity : AppCompatActivity() {
     private lateinit var tvSubtitle: TextView
     private lateinit var tvLangLabel: TextView
     private lateinit var checkDarkMode: CheckBox
+    private lateinit var checkWikiMode: CheckBox
     private lateinit var btnEnable: Button
     private lateinit var tvFooter: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        enableEdgeToEdge()
         val prefs = getSharedPreferences("nias_prefs", Context.MODE_PRIVATE)
         val isDarkMode = prefs.getBoolean("dark_mode", false)
         
@@ -39,11 +42,13 @@ class SettingsActivity : AppCompatActivity() {
         tvSubtitle = findViewById(R.id.tv_subtitle)
         tvLangLabel = findViewById(R.id.tv_lang_label)
         checkDarkMode = findViewById(R.id.check_dark_mode)
+        checkWikiMode = findViewById(R.id.check_wiki_mode)
         btnEnable = findViewById(R.id.btn_enable_ime)
         tvFooter = findViewById(R.id.tv_footer)
 
         // Load saved settings
         checkDarkMode.isChecked = isDarkMode
+        checkWikiMode.isChecked = prefs.getBoolean("wiki_mode", true)
         val savedLang = prefs.getString("app_lang", "en") ?: "en"
         updateLanguageUI(savedLang)
 
@@ -56,6 +61,10 @@ class SettingsActivity : AppCompatActivity() {
             }
             // recreate() is often needed to refresh the theme completely
             recreate()
+        }
+
+        checkWikiMode.setOnCheckedChangeListener { _, isChecked ->
+            prefs.edit { putBoolean("wiki_mode", isChecked) }
         }
 
         findViewById<Button>(R.id.btn_enable_ime).setOnClickListener {
@@ -84,6 +93,7 @@ class SettingsActivity : AppCompatActivity() {
                 tvSubtitle.text = "Ya'ahowu!"
                 tvLangLabel.text = "Halö li:"
                 checkDarkMode.text = "Orifi Mode Ogömi"
+                checkWikiMode.text = "Orifi Mode Wikipedia"
                 btnEnable.text = "Ae Orifi Wafa Wanura"
                 tvFooter.text = "Fa'anö stelan Android"
             }
@@ -92,6 +102,7 @@ class SettingsActivity : AppCompatActivity() {
                 tvSubtitle.text = "Ya'ahowu!"
                 tvLangLabel.text = "Pilih Bahasa:"
                 checkDarkMode.text = "Gunakan Mode Gelap"
+                checkWikiMode.text = "Aktifkan Mode Wikipedia"
                 btnEnable.text = "Aktifkan Keyboard"
                 tvFooter.text = "Atur di Pengaturan Android"
             }
@@ -100,6 +111,7 @@ class SettingsActivity : AppCompatActivity() {
                 tvSubtitle.text = "Ya'ahowu!"
                 tvLangLabel.text = "Choose Language:"
                 checkDarkMode.text = "Enable Dark Mode"
+                checkWikiMode.text = "Enable Wikipedia Mode"
                 btnEnable.text = "Activate Keyboard"
                 tvFooter.text = "Configure in Android Settings"
             }

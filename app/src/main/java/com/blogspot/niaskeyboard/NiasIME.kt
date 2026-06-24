@@ -17,6 +17,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
+import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 
@@ -37,9 +38,13 @@ class NiasIME : InputMethodService() {
     private var lastShiftTime: Long = 0
     private var lastSpaceTime: Long = 0
     private var isNumericMode = false
+    private var isWikiMode = false
 
     override fun onCreate() {
         super.onCreate()
+        window?.window?.let { win ->
+            WindowCompat.setDecorFitsSystemWindows(win, false)
+        }
         loadDictionary("nias-dict.txt", niasWords)
         loadDictionary("indo-dict.txt", indoWords)
         loadLearnedWords()
@@ -58,6 +63,48 @@ class NiasIME : InputMethodService() {
     private fun loadLearnedWords() {
         val prefs = getSharedPreferences("nias_learned_dict", Context.MODE_PRIVATE)
         learnedWords.addAll(prefs.getStringSet("words", emptySet()) ?: emptySet())
+    }
+
+    private fun loadSettings() {
+        val prefs = getSharedPreferences("nias_prefs", Context.MODE_PRIVATE)
+        isWikiMode = prefs.getBoolean("wiki_mode", true)
+    }
+
+    private fun showWikiShortcuts() {
+        if (!::candidateContainer.isInitialized || !::candidateScroll.isInitialized) return
+        candidateContainer.removeAllViews()
+        
+        val wikiKeys = listOf("'''", "''", "[[", "]]", "{{", "}}", "|", "*", ":", "~")
+        val isDark = isDarkMode()
+        val textColor = if (isDark) Color.WHITE else Color.BLACK
+        val btnBgColor = ContextCompat.getColor(this, if (isDark) R.color.gboard_dark_key else R.color.gboard_light_key)
+        
+        for (key in wikiKeys) {
+            val btn = Button(this)
+            btn.text = key
+            btn.setTextColor(textColor)
+            btn.textSize = 16f
+            btn.isAllCaps = false
+            
+            val params = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.MATCH_PARENT
+            )
+            params.setMargins(8, 4, 8, 4)
+            btn.layoutParams = params
+            btn.setPadding(20, 0, 20, 0)
+            btn.minWidth = 0
+            btn.minimumWidth = 0
+            
+            btn.background?.mutate()?.setColorFilter(btnBgColor, PorterDuff.Mode.SRC_IN)
+            
+            btn.setOnClickListener {
+                val ic = currentInputConnection ?: return@setOnClickListener
+                ic.commitText(key, 1)
+            }
+            candidateContainer.addView(btn)
+        }
+        candidateScroll.visibility = View.VISIBLE
     }
 
     private fun learnWord(word: String) {
@@ -87,15 +134,16 @@ class NiasIME : InputMethodService() {
         
         ViewCompat.setOnApplyWindowInsetsListener(inputContainer) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            val navBars = insets.getInsets(WindowInsetsCompat.Type.navigationBars())
             val spacer = v.findViewById<View>(R.id.keyboard_bottom_spacer)
             val params = spacer?.layoutParams
             if (params != null) {
-                params.height = Math.max(systemBars.bottom, navBars.bottom)
+                // Ensure we handle the bottom inset correctly for gesture navigation
+                params.height = systemBars.bottom
                 spacer.layoutParams = params
             }
             insets
         }
+        inputContainer.requestApplyInsets()
 
         updateKeyboardLayout()
         
@@ -370,15 +418,24 @@ class NiasIME : InputMethodService() {
         if (!::candidateContainer.isInitialized || !::candidateScroll.isInitialized) return
         
         candidateContainer.removeAllViews()
+        candidateScroll.scrollTo(0, 0)
         
         if (input.isEmpty()) {
-            candidateScroll.visibility = View.GONE
+            if (isWikiMode) {
+                showWikiShortcuts()
+            } else {
+                candidateScroll.visibility = View.GONE
+            }
             return
         }
 
         val lastWord = input.substringAfterLast(' ', input).lowercase()
         if (lastWord.length < 2) {
-            candidateScroll.visibility = View.GONE
+            if (isWikiMode) {
+                showWikiShortcuts()
+            } else {
+                candidateScroll.visibility = View.GONE
+            }
             return
         }
 
@@ -388,7 +445,11 @@ class NiasIME : InputMethodService() {
             .take(5)
 
         if (matches.isEmpty()) {
-            candidateScroll.visibility = View.GONE
+            if (isWikiMode) {
+                showWikiShortcuts()
+            } else {
+                candidateScroll.visibility = View.GONE
+            }
             return
         }
 
@@ -431,8 +492,12 @@ class NiasIME : InputMethodService() {
         if (lastWord.isNotEmpty()) {
             learnWord(lastWord)
         }
-        candidateContainer.removeAllViews()
-        candidateScroll.visibility = View.GONE
+        if (isWikiMode) {
+            showWikiShortcuts()
+        } else {
+            candidateContainer.removeAllViews()
+            candidateScroll.visibility = View.GONE
+        }
     }
 
     private fun updateSuggestionsAfterDelete() {
@@ -458,16 +523,23 @@ class NiasIME : InputMethodService() {
         }
         
         inputContainer.setBackgroundColor(bgColor)
+        inputContainer.requestApplyInsets()
         
         val bottomSpacer = inputContainer.findViewById<View>(R.id.keyboard_bottom_spacer)
         bottomSpacer?.setBackgroundColor(bgColor)
         
         if (::candidateScroll.isInitialized) {
             candidateScroll.setBackgroundColor(bgColor)
+            val isShowingShortcuts = candidateContainer.childCount > 0 && candidateContainer.getChildAt(0) is Button
+            if (isWikiMode && (isShowingShortcuts || candidateContainer.childCount == 0)) {
+                showWikiShortcuts()
+            }
         }
 
         window?.window?.let { win ->
-            win.navigationBarColor = bgColor
+            if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.VANILLA_ICE_CREAM) {
+                win.navigationBarColor = bgColor
+            }
             val controller = WindowInsetsControllerCompat(win, win.decorView)
             controller.isAppearanceLightNavigationBars = !isDark
         }
@@ -477,9 +549,15 @@ class NiasIME : InputMethodService() {
 
     override fun onStartInputView(info: EditorInfo?, restarting: Boolean) {
         super.onStartInputView(info, restarting)
+        loadSettings()
         applyTheme()
         if (::candidateScroll.isInitialized) {
-            candidateScroll.visibility = View.GONE
+            if (isWikiMode) {
+                showWikiShortcuts()
+            } else {
+                candidateContainer.removeAllViews()
+                candidateScroll.visibility = View.GONE
+            }
         }
         checkAutoCaps()
     }

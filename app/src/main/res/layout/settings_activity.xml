@@ -4,7 +4,8 @@
     android:orientation="vertical"
     android:gravity="center"
     android:background="?attr/colorSurface"
-    android:padding="24dp">
+    android:padding="24dp"
+    android:fitsSystemWindows="true">
 
     <!-- App Icon Placeholder -->
     <ImageView
@@ -83,6 +84,16 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Enable Dark Mode"
+        android:textColor="?attr/colorPrimaryVariant"
+        android:buttonTint="?attr/colorPrimary"
+        android:textSize="18sp"
+        android:layout_marginBottom="24dp" />
+
+    <CheckBox
+        android:id="@+id/check_wiki_mode"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Enable Wikipedia Mode"
         android:textColor="?attr/colorPrimaryVariant"
         android:buttonTint="?attr/colorPrimary"
         android:textSize="18sp"
