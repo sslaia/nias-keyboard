@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nias Keyboard - Smart Typing for Nias & Indonesian</title>
+    <meta name="description" content="The first true Android soft keyboard app for Nias language with built-in characters (ŵ, ö, apostrophe), smart word suggestions, and a specialized Wikipedia editing mode.">
+    <meta name="keywords" content="Nias Keyboard, Li Niha, Android Keyboard, Wikipedia Nias, Nias IME">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-color: #121298; /* Nias Keyboard Icon Deep Blue */
+            --primary-glow: rgba(18, 18, 152, 0.15);
+            --bg-dark: #0a0d14;
+            --bg-card: #111522;
+            --border-color: rgba(255, 255, 255, 0.08);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent-blue: #3b82f6;
+            --accent-glow: rgba(59, 130, 246, 0.2);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            font-family: 'Outfit', sans-serif;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Ambient background glow */
+        .ambient-glow {
+            position: absolute;
+            top: -200px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 800px;
+            height: 800px;
+            background: radial-gradient(circle, rgba(18, 18, 152, 0.35) 0%, rgba(10, 13, 20, 0) 70%);
+            z-index: -1;
+            pointer-events: none;
+            filter: blur(80px);
+        }
+
+        /* Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        /* Header & Nav */
+        header {
+            padding: 24px 0;
+            border-bottom: 1px solid var(--border-color);
+            background: rgba(10, 13, 20, 0.7);
+            backdrop-filter: blur(12px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-img {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(18, 18, 152, 0.3);
+        }
+
+        .logo-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, #ffffff 50%, #b4c6ef 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 24px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: var(--transition);
+        }
+
+        .nav-links a:hover {
+            color: var(--text-main);
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: 80px 0 100px 0;
+            text-align: center;
+            position: relative;
+        }
+
+        .hero-title {
+            font-size: 3.5rem;
+            font-weight: 800;
+            letter-spacing: -1.5px;
+            line-height: 1.15;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #ffffff 60%, #87a4e6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-subtitle {
+            font-size: 1.25rem;
+            color: var(--text-muted);
+            max-width: 640px;
+            margin: 0 auto 36px auto;
+            font-weight: 400;
+        }
+
+        .cta-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            margin-bottom: 60px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 14px 28px;
+            border-radius: 30px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: var(--transition);
+            font-size: 1rem;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: #ffffff;
+            box-shadow: 0 4px 20px rgba(18, 18, 152, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(18, 18, 152, 0.5);
+        }
+
+        .btn-primary:hover {
+            background-color: #1a1ab8;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 24px rgba(18, 18, 152, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-secondary {
+            background-color: rgba(255, 255, 255, 0.05);
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+
+        /* Feature Graphic mockup */
+        .feature-graphic-container {
+            max-width: 900px;
+            margin: 0 auto;
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), 0 0 40px rgba(18, 18, 152, 0.1);
+            background-color: var(--bg-card);
+            padding: 10px;
+        }
+
+        .feature-graphic-img {
+            width: 100%;
+            height: auto;
+            display: block;
+            border-radius: 8px;
+        }
+
+        /* Features Section */
+        .features {
+            padding: 100px 0;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .section-tag {
+            color: var(--accent-blue);
+            font-size: 0.9rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 12px;
+            display: inline-block;
+        }
+
+        .section-title {
+            font-size: 2.25rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 30px;
+        }
+
+        .feature-card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 36px;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-color), var(--accent-blue));
+            opacity: 0;
+            transition: var(--transition);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3), 0 0 20px rgba(18, 18, 152, 0.05);
+            border-color: rgba(18, 18, 152, 0.3);
+        }
+
+        .feature-card:hover::before {
+            opacity: 1;
+        }
+
+        .feature-icon {
+            font-size: 2.5rem;
+            margin-bottom: 24px;
+            display: inline-block;
+        }
+
+        .feature-card-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 14px;
+        }
+
+        .feature-card-desc {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        .feature-card-note {
+            margin-top: 14px;
+            padding: 8px 12px;
+            background: rgba(18, 18, 152, 0.1);
+            border-left: 3px solid var(--primary-color);
+            border-radius: 0 8px 8px 0;
+            font-size: 0.85rem;
+            color: #d1dcf5;
+        }
+
+        /* How to Enable Section */
+        .how-to {
+            padding: 100px 0;
+            border-top: 1px solid var(--border-color);
+            background: linear-gradient(180deg, var(--bg-dark) 0%, rgba(18, 18, 152, 0.05) 50%, var(--bg-dark) 100%);
+        }
+
+        .steps-container {
+            max-width: 700px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .step-item {
+            display: flex;
+            gap: 20px;
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 24px;
+            align-items: center;
+        }
+
+        .step-num {
+            width: 48px;
+            height: 48px;
+            background-color: var(--primary-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.25rem;
+            color: white;
+            box-shadow: 0 4px 12px rgba(18, 18, 152, 0.4);
+            flex-shrink: 0;
+        }
+
+        .step-text h4 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .step-text p {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        /* Footer */
+        footer {
+            border-top: 1px solid var(--border-color);
+            padding: 60px 0 40px 0;
+            text-align: center;
+            background-color: #06090f;
+        }
+
+        .footer-logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 24px;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            list-style: none;
+            margin-bottom: 30px;
+        }
+
+        .footer-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: var(--transition);
+        }
+
+        .footer-links a:hover {
+            color: var(--text-main);
+        }
+
+        .copyright {
+            color: #475569;
+            font-size: 0.85rem;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 2.5rem;
+            }
+            .cta-buttons {
+                flex-direction: column;
+                max-width: 320px;
+                margin: 0 auto 40px auto;
+            }
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+            .nav-links {
+                display: none; /* simple responsive approach */
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="ambient-glow"></div>
+
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <nav>
+                <div class="logo-group">
+                    <img class="logo-img" src="nias-keyboard-icon.png" alt="Nias Keyboard Logo">
+                    <span class="logo-title">Nias Keyboard</span>
+                </div>
+                <ul class="nav-links">
+                    <li><a href="#features">Features</a></li>
+                    <li><a href="#install">Instructions</a></li>
+                    <li><a href="privacy-policy.html">Privacy Policy</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main>
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="container">
+                <h1 class="hero-title" id="hero_heading">Typing Made Smart for Li Niha</h1>
+                <p class="hero-subtitle">The first native soft keyboard for the Nias language. Type seamlessly with Nias symbols, auto-completion, and dedicated tools for Wikipedia contributors.</p>
+                <div class="cta-buttons">
+                    <a href="#install" class="btn btn-primary" id="btn_get_started">Get Started</a>
+                    <a href="privacy-policy.html" class="btn btn-secondary" id="btn_privacy">Privacy Policy</a>
+                </div>
+                
+                <div class="feature-graphic-container">
+                    <img class="feature-graphic-img" src="nias-keyboard_feature-graphic.png" alt="Nias Keyboard Feature Graphic Layout">
+                </div>
+            </div>
+        </section>
+
+        <!-- Features Section -->
+        <section class="features" id="features">
+            <div class="container">
+                <div class="section-header">
+                    <span class="section-tag">Key capabilities</span>
+                    <h2 class="section-title">Everything you need, built-in</h2>
+                </div>
+
+                <div class="features-grid">
+                    <!-- Feature 1 -->
+                    <div class="feature-card" id="card_word_prediction">
+                        <span class="feature-icon">✨</span>
+                        <h3 class="feature-card-title">Dual-Language Autocomplete</h3>
+                        <p class="feature-card-desc">Features smart word completion for both <strong>Indonesian</strong> and <strong>Nias (Li Niha)</strong>. Auto-learns new vocabulary as you type to make predictions more personalized.</p>
+                        <p class="feature-card-note">💡 <em>Note: Toggle the Wiki codes row off in order to display dictionary word completions.</em></p>
+                    </div>
+
+                    <!-- Feature 2 -->
+                    <div class="feature-card" id="card_wiki_toggle">
+                        <span class="feature-icon">📝</span>
+                        <h3 class="feature-card-title">Wiki Codes Toggle</h3>
+                        <p class="feature-card-desc">A specialized quick-access row designed for Wikipedia volunteers. Input syntax shortcuts like <code>[[</code>, <code>]]</code>, <code>{{</code>, and <code>}}</code> instantly. Toggle the bar on or off at the left corner of the row.</p>
+                    </div>
+
+                    <!-- Feature 3 -->
+                    <div class="feature-card" id="card_special_char">
+                        <span class="feature-icon">⌨️</span>
+                        <h3 class="feature-card-title">Native Special Characters</h3>
+                        <p class="feature-card-desc">Type native characters directly. Press keys long-press for Nias letters and international symbols: <strong>ŵ</strong> (w), <strong>ö</strong> (o), <strong>ä</strong> (a), <strong>ü</strong> (u), <strong>€</strong> (e), <strong>£</strong> (l), and more.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- How to Enable Section -->
+        <section class="how-to" id="install">
+            <div class="container">
+                <div class="section-header">
+                    <span class="section-tag">Setup Guide</span>
+                    <h2 class="section-title">How to enable Nias Keyboard</h2>
+                </div>
+
+                <div class="steps-container">
+                    <div class="step-item" id="step_enable_ime">
+                        <div class="step-num">1</div>
+                        <div class="step-text">
+                            <h4>Enable in Settings</h4>
+                            <p>Open the app, tap <strong>Activate Keyboard</strong> and toggle <strong>Nias Keyboard</strong> on in your system settings.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="step-item" id="step_switch_ime">
+                        <div class="step-num">2</div>
+                        <div class="step-text">
+                            <h4>Switch Input Method</h4>
+                            <p>Focus any text field, tap the small keyboard icon at the bottom right corner of the screen, and select <strong>Nias Keyboard</strong>.</p>
+                        </div>
+                    </div>
+
+                    <div class="step-item" id="step_enjoy">
+                        <div class="step-num">3</div>
+                        <div class="step-text">
+                            <h4>Start Typing</h4>
+                            <p>Switch between Nias and Indonesian using the globe icon (🌐). Use the <strong>Wiki</strong> toggle to access editing codes instantly!</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-logo">
+                <img class="logo-img" src="nias-keyboard-icon.png" alt="Nias Keyboard Logo">
+                <span class="logo-title">Nias Keyboard</span>
+            </div>
+            <ul class="footer-links">
+                <li><a href="#features">Features</a></li>
+                <li><a href="#install">Instructions</a></li>
+                <li><a href="privacy-policy.html">Privacy Policy</a></li>
+                <li><a href="mailto:slaia@yahoo.com">Contact Support</a></li>
+            </ul>
+            <p class="copyright">&copy; 2026 Nias Keyboard. Ya'ahowu! All rights reserved.</p>
+        </div>
+    </footer>
+
+</body>
+</html>
