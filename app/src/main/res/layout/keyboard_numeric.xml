@@ -32,7 +32,7 @@
     </LinearLayout>
 
     <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal">
-        <Button style="@style/SpecialKeyStyle" android:text="*" android:tag="42" android:layout_weight="1.5"/>
+        <Button style="@style/SpecialKeyStyle" android:text="=\&lt;" android:tag="-6" android:layout_weight="1.5"/>
         <Button style="@style/KeyStyle" android:text="&quot;" android:tag="34" android:layout_weight="1"/>
         <Button style="@style/KeyStyle" android:text="'" android:tag="39" android:layout_weight="1"/>
         <Button style="@style/KeyStyle" android:text=":" android:tag="58" android:layout_weight="1"/>

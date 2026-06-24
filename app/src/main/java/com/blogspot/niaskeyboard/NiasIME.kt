@@ -27,6 +27,7 @@ class NiasIME : InputMethodService() {
     private lateinit var inputContainer: View
     private lateinit var candidateContainer: LinearLayout
     private lateinit var candidateScroll: View
+    private lateinit var btnWikiToggle: Button
     
     private var niasWords = mutableSetOf<String>()
     private var indoWords = mutableSetOf<String>()
@@ -38,6 +39,7 @@ class NiasIME : InputMethodService() {
     private var lastShiftTime: Long = 0
     private var lastSpaceTime: Long = 0
     private var isNumericMode = false
+    private var isSymbolsShifted = false
     private var isWikiMode = false
 
     override fun onCreate() {
@@ -73,8 +75,8 @@ class NiasIME : InputMethodService() {
     private fun showWikiShortcuts() {
         if (!::candidateContainer.isInitialized || !::candidateScroll.isInitialized) return
         candidateContainer.removeAllViews()
-        
-        val wikiKeys = listOf("'''", "''", "[[", "]]", "{{", "}}", "|", "*", ":", "~")
+
+        val wikiKeys = listOf( "~", "*", ":", "|", "[[", "]]", "{{", "}}", "'''", "''")
         val isDark = isDarkMode()
         val textColor = if (isDark) Color.WHITE else Color.BLACK
         val btnBgColor = ContextCompat.getColor(this, if (isDark) R.color.gboard_dark_key else R.color.gboard_light_key)
@@ -131,7 +133,12 @@ class NiasIME : InputMethodService() {
         keyboardContainer = inputContainer.findViewById(R.id.keyboard_container)
         candidateContainer = inputContainer.findViewById(R.id.candidate_container)
         candidateScroll = inputContainer.findViewById(R.id.candidate_scroll)
+        btnWikiToggle = inputContainer.findViewById(R.id.btn_wiki_toggle)
         
+        btnWikiToggle.setOnClickListener {
+            toggleWikiMode()
+        }
+
         ViewCompat.setOnApplyWindowInsetsListener(inputContainer) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             val spacer = v.findViewById<View>(R.id.keyboard_bottom_spacer)
@@ -146,6 +153,7 @@ class NiasIME : InputMethodService() {
         inputContainer.requestApplyInsets()
 
         updateKeyboardLayout()
+        updateWikiToggleState()
         
         return inputContainer
     }
@@ -153,7 +161,9 @@ class NiasIME : InputMethodService() {
     private fun updateKeyboardLayout() {
         keyboardContainer.removeAllViews()
         val layoutId = when {
-            isNumericMode -> R.layout.keyboard_numeric
+            isNumericMode -> {
+                if (isSymbolsShifted) R.layout.keyboard_symbols else R.layout.keyboard_numeric
+            }
             isNiasMode -> R.layout.keyboard_nias
             else -> R.layout.keyboard_indo
         }
@@ -327,6 +337,11 @@ class NiasIME : InputMethodService() {
             }
             -2 -> { // Mode Change
                 isNumericMode = !isNumericMode
+                isSymbolsShifted = false
+                updateKeyboardLayout()
+            }
+            -6 -> { // Toggle secondary symbols
+                isSymbolsShifted = !isSymbolsShifted
                 updateKeyboardLayout()
             }
             32 -> { // Space bar
@@ -352,6 +367,7 @@ class NiasIME : InputMethodService() {
             -100 -> { // Language Switch
                 isNiasMode = !isNiasMode
                 isNumericMode = false
+                isSymbolsShifted = false
                 updateKeyboardLayout()
                 Toast.makeText(this, if(isNiasMode) "Nias" else "Indonesia", Toast.LENGTH_SHORT).show()
                 candidateContainer.removeAllViews()
@@ -420,22 +436,19 @@ class NiasIME : InputMethodService() {
         candidateContainer.removeAllViews()
         candidateScroll.scrollTo(0, 0)
         
+        if (isWikiMode) {
+            showWikiShortcuts()
+            return
+        }
+        
         if (input.isEmpty()) {
-            if (isWikiMode) {
-                showWikiShortcuts()
-            } else {
-                candidateScroll.visibility = View.GONE
-            }
+            candidateScroll.visibility = View.GONE
             return
         }
 
         val lastWord = input.substringAfterLast(' ', input).lowercase()
         if (lastWord.length < 2) {
-            if (isWikiMode) {
-                showWikiShortcuts()
-            } else {
-                candidateScroll.visibility = View.GONE
-            }
+            candidateScroll.visibility = View.GONE
             return
         }
 
@@ -445,11 +458,7 @@ class NiasIME : InputMethodService() {
             .take(5)
 
         if (matches.isEmpty()) {
-            if (isWikiMode) {
-                showWikiShortcuts()
-            } else {
-                candidateScroll.visibility = View.GONE
-            }
+            candidateScroll.visibility = View.GONE
             return
         }
 
@@ -545,6 +554,7 @@ class NiasIME : InputMethodService() {
         }
         
         applyThemeToKeys(keyboardContainer)
+        updateWikiToggleState()
     }
 
     override fun onStartInputView(info: EditorInfo?, restarting: Boolean) {
@@ -560,5 +570,42 @@ class NiasIME : InputMethodService() {
             }
         }
         checkAutoCaps()
+    }
+
+    private fun toggleWikiMode() {
+        isWikiMode = !isWikiMode
+        val prefs = getSharedPreferences("nias_prefs", Context.MODE_PRIVATE)
+        prefs.edit().putBoolean("wiki_mode", isWikiMode).apply()
+        
+        updateWikiToggleState()
+        
+        val ic = currentInputConnection
+        val content = ic?.getTextBeforeCursor(20, 0)?.toString() ?: ""
+        
+        if (isWikiMode) {
+            showWikiShortcuts()
+        } else {
+            suggestWords(content)
+        }
+    }
+
+    private fun updateWikiToggleState() {
+        if (!::btnWikiToggle.isInitialized) return
+        
+        val isDark = isDarkMode()
+        val activeColor = ContextCompat.getColor(this, if (isDark) R.color.gboard_dark_blue else R.color.gboard_blue)
+        val inactiveColor = ContextCompat.getColor(this, if (isDark) R.color.gboard_dark_key else R.color.gboard_light_key)
+        val textColor = if (isDark) Color.WHITE else Color.BLACK
+        val activeTextColor = if (isDark) Color.BLACK else Color.WHITE
+        
+        if (isWikiMode) {
+            btnWikiToggle.text = "Wiki"
+            btnWikiToggle.background?.mutate()?.setColorFilter(activeColor, PorterDuff.Mode.SRC_IN)
+            btnWikiToggle.setTextColor(activeTextColor)
+        } else {
+            btnWikiToggle.text = "Wiki"
+            btnWikiToggle.background?.mutate()?.setColorFilter(inactiveColor, PorterDuff.Mode.SRC_IN)
+            btnWikiToggle.setTextColor(textColor)
+        }
     }
 }

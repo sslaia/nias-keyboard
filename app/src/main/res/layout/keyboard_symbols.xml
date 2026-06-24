@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="2dp">
+
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal">
+        <Button style="@style/KeyStyle" android:text="~" android:tag="126" android:layout_weight="1"/>
+        <Button style="@style/KeyStyle" android:text="`" android:tag="96" android:layout_weight="1"/>
+        <Button style="@style/KeyStyle" android:text="|" android:tag="124" android:layout_weight="1"/>
+        <Button style="@style/KeyStyle" android:text="•" android:tag="8226" android:layout_weight="1"/>
+        <Button style="@style/KeyStyle" android:text="√" android:tag="8730" android:layout_weight="1"/>
+        <Button style="@style/KeyStyle" android:text="π" android:tag="960" android:layout_weight="1"/>
+        <Button style="@style/KeyStyle" android:text="÷" android:tag="247" android:layout_weight="1"/>
+        <Button style="@style/KeyStyle" android:text="×" android:tag="215" android:layout_weight="1"/>
+        <Button style="@style/KeyStyle" android:text="¶" android:tag="182" android:layout_weight="1"/>
+        <Button style="@style/KeyStyle" android:text="Δ" android:tag="916" android:layout_weight="1"/>
+    </LinearLayout>
+
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal">
+        <Button style="@style/KeyStyle" android:text="£" android:tag="163" android:layout_weight="1"/>
+        <Button style="@style/KeyStyle" android:text="¢" android:tag="162" android:layout_weight="1"/>
+        <Button style="@style/KeyStyle" android:text="€" android:tag="8364" android:layout_weight="1"/>
+        <Button style="@style/KeyStyle" android:text="¥" android:tag="165" android:layout_weight="1"/>
+        <Button style="@style/KeyStyle" android:text="^" android:tag="94" android:layout_weight="1"/>
+        <Button style="@style/KeyStyle" android:text="°" android:tag="176" android:layout_weight="1"/>
+        <Button style="@style/KeyStyle" android:text="=" android:tag="61" android:layout_weight="1"/>
+        <Button style="@style/KeyStyle" android:text="{" android:tag="123" android:layout_weight="1"/>
+        <Button style="@style/KeyStyle" android:text="}" android:tag="125" android:layout_weight="1"/>
+        <Button style="@style/KeyStyle" android:text="\" android:tag="92" android:layout_weight="1"/>
+    </LinearLayout>
+
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal">
+        <Button style="@style/SpecialKeyStyle" android:text="\?123" android:tag="-6" android:layout_weight="1.5"/>
+        <Button style="@style/KeyStyle" android:text="[" android:tag="91" android:layout_weight="1"/>
+        <Button style="@style/KeyStyle" android:text="]" android:tag="93" android:layout_weight="1"/>
+        <Button style="@style/KeyStyle" android:text="&lt;" android:tag="60" android:layout_weight="1"/>
+        <Button style="@style/KeyStyle" android:text="&gt;" android:tag="62" android:layout_weight="1"/>
+        <Button style="@style/KeyStyle" android:text="§" android:tag="167" android:layout_weight="1"/>
+        <Button style="@style/KeyStyle" android:text="*" android:tag="42" android:layout_weight="1"/>
+        <Button style="@style/KeyStyle" android:text="¿" android:tag="191" android:layout_weight="1"/>
+        <Button style="@style/SpecialKeyStyle" android:text="⬅️" android:tag="-5" android:layout_weight="1.5"/>
+    </LinearLayout>
+
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal">
+        <Button style="@style/SpecialKeyStyle" android:text="ABC" android:tag="-2" android:layout_weight="2"/>
+        <Button style="@style/SpecialKeyStyle" android:text="🌐" android:tag="-100" android:layout_weight="1"/>
+        <Button style="@style/KeyStyle" android:text=" " android:tag="32" android:layout_weight="4"/>
+        <Button style="@style/SpecialKeyStyle" android:text="😀" android:tag="-101" android:layout_weight="1"/>
+        <Button style="@style/SpecialKeyStyle" android:text="↩️" android:tag="-4" android:layout_weight="2"/>
+    </LinearLayout>
+</LinearLayout>

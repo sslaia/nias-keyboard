@@ -5,22 +5,46 @@
     android:orientation="vertical">
 
     <!-- Integrated Candidate/Suggestion Bar -->
-    <HorizontalScrollView
-        android:id="@+id/candidate_scroll"
+    <LinearLayout
+        android:id="@+id/candidate_bar_layout"
         android:layout_width="match_parent"
         android:layout_height="48dp"
-        android:visibility="gone"
-        android:fillViewport="true"
-        android:scrollbars="none">
-        <LinearLayout
-            android:id="@+id/candidate_container"
-            android:layout_width="match_parent"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingStart="4dp"
+        android:paddingEnd="4dp">
+
+        <Button
+            android:id="@+id/btn_wiki_toggle"
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"
+            android:text="Wiki"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:minWidth="44dp"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            android:background="@drawable/key_bg"
+            style="@style/Widget.AppCompat.Button.Borderless" />
+
+        <HorizontalScrollView
+            android:id="@+id/candidate_scroll"
+            android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:orientation="horizontal"
-            android:gravity="center"
-            android:paddingStart="12dp"
-            android:paddingEnd="12dp" />
-    </HorizontalScrollView>
+            android:layout_weight="1"
+            android:visibility="gone"
+            android:fillViewport="true"
+            android:scrollbars="none">
+            <LinearLayout
+                android:id="@+id/candidate_container"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp" />
+        </HorizontalScrollView>
+    </LinearLayout>
 
     <!-- CONTAINER FOR DYNAMIC KEYBOARD LAYOUTS -->
     <FrameLayout
