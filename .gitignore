@@ -5,3 +5,7 @@ local.properties
 .idea/
 app/build/
 *.apk
+
+# TODOs
+TODO.*
+

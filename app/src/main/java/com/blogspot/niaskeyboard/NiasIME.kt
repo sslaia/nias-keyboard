@@ -79,7 +79,7 @@ class NiasIME : InputMethodService() {
         if (!::candidateContainer.isInitialized || !::candidateScroll.isInitialized) return
         candidateContainer.removeAllViews()
 
-        val wikiKeys = listOf( "~", "*", ":", "|", "[[", "]]", "{{", "}}", "'''", "''")
+        val wikiKeys = listOf("-", "~", "*", ":", "|", "[[", "]]", "{{", "}}", "'''", "''")
         val isDark = isDarkMode()
         val textColor = if (isDark) Color.WHITE else Color.BLACK
         val btnBgColor = ContextCompat.getColor(this, if (isDark) R.color.gboard_dark_key else R.color.gboard_light_key)
