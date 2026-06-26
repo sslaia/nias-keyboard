@@ -5,7 +5,10 @@ import android.content.res.Configuration
 import android.graphics.Color
 import android.graphics.PorterDuff
 import android.inputmethodservice.InputMethodService
+import android.os.Handler
+import android.os.Looper
 import android.view.KeyEvent
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
@@ -183,19 +186,54 @@ class NiasIME : InputMethodService() {
                 bindKeyClicks(parent.getChildAt(i))
             }
         } else if (parent is Button) {
-            parent.setOnClickListener {
-                val code = (it.tag as? String)?.toInt() ?: 0
-                handleKey(code, it)
-            }
-            
             val code = (parent.tag as? String)?.toInt() ?: 0
-            if (isSpecialKey(code)) {
-                parent.setOnLongClickListener {
-                    showLongPressOptions(it, code)
-                    true
+            if (code == -5) {
+                setupDeleteButtonRepeat(parent)
+            } else {
+                parent.setOnClickListener {
+                    handleKey(code, it)
+                }
+                if (isSpecialKey(code)) {
+                    parent.setOnLongClickListener {
+                        showLongPressOptions(it, code)
+                        true
+                    }
                 }
             }
         }
+    }
+
+    private fun setupDeleteButtonRepeat(button: Button) {
+        button.setOnTouchListener(object : View.OnTouchListener {
+            private var mHandler: Handler? = null
+            private val mAction = object : Runnable {
+                override fun run() {
+                    handleKey(-5, button)
+                    mHandler?.postDelayed(this, 50)
+                }
+            }
+
+            override fun onTouch(v: View, event: MotionEvent): Boolean {
+                when (event.action) {
+                    MotionEvent.ACTION_DOWN -> {
+                        if (mHandler != null) return true
+                        mHandler = Handler(Looper.getMainLooper())
+                        handleKey(-5, button)
+                        mHandler?.postDelayed(mAction, 400)
+                        v.isPressed = true
+                        v.performClick()
+                        return true
+                    }
+                    MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                        mHandler?.removeCallbacks(mAction)
+                        mHandler = null
+                        v.isPressed = false
+                        return true
+                    }
+                }
+                return false
+            }
+        })
     }
 
     private fun isSpecialKey(code: Int): Boolean {
@@ -212,8 +250,8 @@ class NiasIME : InputMethodService() {
         }
 
         val options = when (code) {
-            44 -> "!?-"
-            46 -> "±~|{}[]"
+            44 -> ";:!?-"
+            46 -> "±~*|{}[]"
             97 -> "åãâáàä"
             101 -> "ęēëêéè€"
             105 -> "ïîíì"
